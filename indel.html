@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Welcome to MoQ</h1>
+    </header>
+    <main>
+        <!-- Login Page -->
+        <div id="login-container">
+            <h2>Login</h2>
+            <input type="text" id="username-login" placeholder="Username">
+            <input type="password" id="password-login" placeholder="Password">
+            <button id="login-button">Sign In</button>
+            <button id="signup-redirect">Sign Up</button>
+        </div>
+
+        <!-- Sign-Up Page -->
+        <div id="signup-container">
+            <h2>Register</h2>
+            <input type="text" id="username-register" placeholder="Username">
+            <input type="password" id="password-register" placeholder="Password">
+            <input type="password" id="password-confirm" placeholder="Re-enter Password">
+            <button id="register-button">Register</button>
+        </div>
+
+        <!-- Sign-In Successful Page -->
+        <div id="signin-success-container">
+            <h2>Sign In Successful</h2>
+            <p>Welcome, user!</p>
+            <p>Please choose your role:</p>
+            <select id="role-selection">
+                <option value="Developer">Developer</option>
+                <option value="Data Scientist">Data Scientist</option>
+                <option value="Project Manager">Project Manager</option>
+                <option value="QA">QA</option>
+                <option value="UI designer">UI designer</option>
+                <option value="ML Engineer">ML Engineer</option>
+                <option value="HR">HR</option>
+                <option value="Intern">Intern</option>
+            </select>
+            <button id="start-interview">Start Interview</button>
+            <button id="logout-button">Logout</button>
+        </div>
+
+        <!-- Interview Questions Page -->
+        <div id="questions-container">
+            <h2 id="question-title">Interview Questions</h2>
+            <p id="prep-timer">Prep Time: <span id="prep-time">30</span> seconds</p>
+            <p id="record-timer">Recording Time: <span id="record-time">120</span> seconds</p>
+            <div id="question-area">
+                <p id="question-text">Question 1: [Question Content Here]</p>
+            </div>
+            <video id="video-preview" autoplay muted></video>
+            <button id="start-recording-button">Start Recording</button>
+            <button id="stop-recording-button" disabled>Stop Recording</button>
+            <button id="mark-done-button" disabled>Mark as Done</button>
+            <button id="logout-button-questions">Logout</button>
+            
+        </div>
+
+        <!-- Admin Panel Page -->
+        <div id="admin-panel-container">
+            <h2>Admin Panel</h2>
+            <table id="user-table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Password</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="user-list">
+                    <!-- User rows will be dynamically added here -->
+                </tbody>
+            </table>
+            <button id="admin-logout-button">Logout</button>
+        </div>
+
+        <!-- Edit Form (only visible when editing a user) -->
+        <div id="edit-user-container">
+            <h2>Edit User</h2>
+            <input type="text" id="edit-username" placeholder="New Username">
+            <input type="password" id="edit-password" placeholder="New Password">
+            <button id="save-changes-button">Save Changes</button>
+            <button id="cancel-edit-button">Cancel</button>
+        </div>
+    </main>
+    <footer>
+        &copy; 2024 MoQ interview System
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+header {
+    background-color: #333;
+    color: white;
+    padding: 1em;
+    text-align: center;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2em;
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    padding: 1em;
+    text-align: center;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
+#login-container,
+#signup-container,
+#signin-success-container,
+#admin-panel-container,
+#edit-user-container,
+#questions-container {
+    display: none;
+    width: 30%;
+    margin: 0 auto;
+    background-color: #f0f0f0;
+    padding: 2em;
+    border-radius: 10px;
+}
+
+#login-container input,
+#signup-container input,
+#edit-user-container input {
+    width: 100%;
+    margin: 0.5em 0;
+    padding: 0.5em;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+#login-button, #signup-redirect, #register-button, #save-changes-button, #cancel-edit-button, #logout-button, #logout-button-questions, #admin-logout-button, #start-recording-button, #stop-recording-button, #mark-done-button, #start-interview {
+    padding: 0.5em 2em;
+    margin: 1em;
+    border: none;
+    border-radius: 5px;
+    background-color: #333;
+    color: white;
+    cursor: pointer;
+}
+
+#question-area {
+    margin: 1em 0;
+}
+
+#prep-timer, #record-timer {
+    font-size: 1.2em;
+}
+
+#video-preview {
+    width: 100%;
+    height: auto;
+    margin: 1em 0;
+}
