@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+    <h2>Welcome to the User Dashboard</h2>
+    <p>Sign In successful. You're now logged in!</p>
+    <form method="GET" action="{{ url_for('logout') }}">
+        <button type="submit">Logout</button>
+    </form>
+</body>
+</html>

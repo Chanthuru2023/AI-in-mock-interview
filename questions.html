@@ -1,0 +1,185 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>Questions</title>
+    <script>
+        let prepTime = 30;
+        let recordTime = 120;
+
+        function startPrep() {
+            let prepInterval = setInterval(() => {
+                if (prepTime > 0) {
+                    document.getElementById('prep-timer').innerText = prepTime + ' seconds remaining for prep time';
+                    prepTime--;
+                } else {
+                    clearInterval(prepInterval);
+                    startRecording();
+                }
+            }, 1000);
+        }
+
+        function startRecording() {
+            document.getElementById('prep-timer').innerText = 'Recording started';
+            let recordInterval = setInterval(() => {
+                if (recordTime > 0) {
+                    document.getElementById('prep-timer').innerText = recordTime + ' seconds remaining for recording';
+                    recordTime--;
+                } else {
+                    clearInterval(recordInterval);
+                    document.getElementById('prep-timer').innerText = 'Recording time over!';
+                }
+            }, 1000);
+        }
+    </script>
+</head>
+<body onload="startPrep()">
+    <h2>Question {{ question_num }}</h2>
+    <p>{{ question }}</p>
+
+    <div id="prep-timer"></div>
+    
+    <form method="POST" enctype="multipart/form-data" action="{{ url_for('upload_video') }}">
+        <label for="video">Record your answer (2 minutes max):</label>
+        <input type="file" name="video" accept="video/*" required><br><br>
+        <button type="submit">Upload Video</button>
+    </form>
+
+    <form method="POST">
+        <button type="submit" name="done">Next Question</button>
+    </form>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interview Question</title>
+    <style>
+        #preview-video {
+            display: none;
+            width: 320px;
+            height: 240px;
+        }
+    </style>
+    <script>
+        let mediaRecorder;
+        let recordedChunks = [];
+        let prepTime = 30;
+        let recordTime = 120;
+        let recordingStarted = false;
+
+        async function startPrepTimer() {
+            document.getElementById('prep-timer').innerText = prepTime + ' seconds left for prep...';
+            let prepInterval = setInterval(() => {
+                prepTime--;
+                if (prepTime > 0) {
+                    document.getElementById('prep-timer').innerText = prepTime + ' seconds left for prep...';
+                } else {
+                    clearInterval(prepInterval);
+                    startRecording();
+                }
+            }, 1000);
+        }
+
+        async function startRecording() {
+            // Initialize media recorder for video/audio capture
+            const constraints = { video: true, audio: true };
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            
+            document.getElementById('video-preview').srcObject = stream;
+            document.getElementById('video-preview').play();
+
+            mediaRecorder = new MediaRecorder(stream);
+            recordingStarted = true;
+
+            mediaRecorder.ondataavailable = function(event) {
+                if (event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = function() {
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                document.getElementById('preview-video').src = url;
+                document.getElementById('preview-video').style.display = 'block';
+                document.getElementById('stop-recording-btn').disabled = true;
+
+                // Enable the "Upload Video" button
+                document.getElementById('upload-btn').disabled = false;
+            };
+
+            // Start recording
+            mediaRecorder.start();
+            startRecordTimer();
+        }
+
+        function startRecordTimer() {
+            document.getElementById('prep-timer').innerText = recordTime + ' seconds left for recording...';
+            let recordInterval = setInterval(() => {
+                recordTime--;
+                if (recordTime > 0) {
+                    document.getElementById('prep-timer').innerText = recordTime + ' seconds left for recording...';
+                } else {
+                    clearInterval(recordInterval);
+                    stopRecording(); // Automatically stop recording after 2 minutes
+                }
+            }, 1000);
+        }
+
+        function stopRecording() {
+            if (recordingStarted) {
+                mediaRecorder.stop();
+                document.getElementById('video-preview').srcObject.getTracks().forEach(track => track.stop());
+                document.getElementById('stop-recording-btn').disabled = true;
+                document.getElementById('prep-timer').innerText = 'Recording stopped!';
+            }
+        }
+
+        // Upload the recorded video to the server
+        function uploadVideo() {
+            const blob = new Blob(recordedChunks, { type: 'video/webm' });
+            const formData = new FormData();
+            formData.append('video', blob, 'interview_video.webm');
+
+            fetch('{{ url_for("upload_video") }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                window.location.href = '{{ url_for("questions") }}';
+            })
+            .catch(error => {
+                console.error('Error uploading video:', error);
+            });
+        }
+    </script>
+</head>
+<body onload="startPrepTimer()">
+    <h2>Question {{ question_num }}</h2>
+    <p>{{ question }}</p>
+
+    <!-- Display Timer -->
+    <div id="prep-timer"></div>
+
+    <!-- Video preview during recording -->
+    <video id="video-preview" width="320" height="240" autoplay muted></video><br>
+
+    <!-- Stop Recording Button -->
+    <button id="stop-recording-btn" onclick="stopRecording()">Stop Recording</button><br>
+
+    <!-- Preview the recorded video -->
+    <h3>Video Preview:</h3>
+    <video id="preview-video" controls></video><br>
+
+    <!-- Upload Button -->
+    <button id="upload-btn" onclick="uploadVideo()" disabled>Upload Video</button><br>
+
+    <!-- Button to go to the next question -->
+    <form method="POST">
+        <button type="submit" name="done">Next Question</button>
+    </form>
+</body>
+</html>
+
