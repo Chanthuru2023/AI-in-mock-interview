@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock Interview Tool - Video Recording with Speech-to-Text and Sentiment Analysis</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin-top: 50px;
+            background-color: rgb(240, 217, 220);
+        }
+        .container {
+            max-width: 800px;
+        }
+        video {
+            width: 100%;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .btn {
+            margin: 10px 5px;
+        }
+        textarea {
+            width: 100%;
+            height: 250px;
+            margin-top: 20px;
+        }
+        #sentiment {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 class="text-center mb-4">Mock Interview Tool</h1>
+        <div class="text-center">
+            <video id="video" controls autoplay class="mb-3"></video>
+        </div>
+        
+        <div class="text-center">
+            <button id="startRecord" class="btn btn-success">Start Recording</button>
+            <button id="stopRecord" class="btn btn-danger" disabled>Stop Recording</button>
+            <button id="downloadText" class="btn btn-primary" disabled>Download Transcription</button>
+            <button id="downloadVideo" class="btn btn-info" disabled>Download Video</button>
+            <button class="btn btn-link" onclick="refreshPage()">Refresh Page</button>
+            <i class="fas fa-refresh"></i>
+        </div>
+
+        <div class="form-group">
+            <label for="transcription"><strong>Speech-to-Text Transcription</strong></label>
+            <textarea id="transcription" class="form-control" placeholder="Transcription will appear here..."></textarea>
+        </div>
+
+        <div id="sentiment" class="text-center">
+            <label><strong>Sentiment Results:</strong></label>
+            <p>positive, Negative or Neutral?</p>
+            <br>
+            <label id="sentimentResult">N/A</label>
+            <br>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Mock Interview Tool</p>
+    </footer>
+
+    <!-- Bootstrap JS and dependencies (jQuery and Popper.js) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        const video = document.getElementById('video');
+        const startRecordButton = document.getElementById('startRecord');
+        const stopRecordButton = document.getElementById('stopRecord');
+        const downloadButton = document.getElementById('downloadText');
+        const downloadVideoButton = document.getElementById('downloadVideo');
+        const transcriptionArea = document.getElementById('transcription');
+        const sentimentResult = document.getElementById('sentimentResult');
+        let mediaRecorder;
+        let recordedBlobs = [];
+
+        function refreshPage() {
+            window.location.reload(); // Reloads the current page
+        }
+
+        // Access webcam
+        async function initCamera() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            video.srcObject = stream;
+            return stream;
+        }
+
+        // Initialize speech recognition
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.interimResults = true;
+        recognition.continuous = true;
+
+        recognition.onresult = (event) => {
+            let transcript = '';
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                if (event.results[i].isFinal) {
+            transcript += event.results[i][0].transcript;
+                }
+            }
+            transcriptionArea.value = transcript;
+            analyzeSentiment(transcriptionArea.value);  // Analyze sentiment on transcription update
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+        };
+
+        // Start recording
+        startRecordButton.addEventListener('click', async () => {
+            const stream = await initCamera();
+            recordedBlobs = [];
+            mediaRecorder = new MediaRecorder(stream);
+            
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    recordedBlobs.push(event.data);
+                }
+            };
+
+            mediaRecorder.start();
+            recognition.start();
+            startRecordButton.disabled = true;
+            stopRecordButton.disabled = false;
+            downloadButton.disabled = true;
+            downloadVideoButton.disabled = true;
+        });
+
+        // Stop recording
+        stopRecordButton.addEventListener('click', () => {
+            mediaRecorder.stop();
+            recognition.stop();
+            startRecordButton.disabled = false;
+            stopRecordButton.disabled = true;
+            downloadButton.disabled = false;
+            downloadVideoButton.disabled = false;
+        });
+
+        // Download transcription as a file
+        downloadButton.addEventListener('click', () => {
+            const blob = new Blob([transcriptionArea.value], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'transcription.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Download video as a file
+        downloadVideoButton.addEventListener('click', () => {
+            const blob = new Blob(recordedBlobs, { type: 'video/webm' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'interview_video.webm';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Basic Sentiment Analysis Function
+        function analyzeSentiment(text) {
+            const positiveWords = ['good', 'great', 'excellent', 'happy', 'amazing'];
+            const negativeWords = ['bad', 'terrible', 'sad', 'poor', 'horrible'];
+
+            let positiveCount = 0;
+            let negativeCount = 0;
+
+            const words = text.toLowerCase().split(/\s+/);
+
+            words.forEach(word => {
+                if (positiveWords.includes(word)) {
+                    positiveCount++;
+                }
+                if (negativeWords.includes(word)) {
+                    negativeCount++;
+                }
+            });
+
+            if (positiveCount > negativeCount) {
+                sentimentResult.textContent = 'Positive';
+            } else if (negativeCount > positiveCount) {
+                sentimentResult.textContent = 'Negative';
+            } else {
+                sentimentResult.textContent = 'Neutral';
+            }
+        }
+    </script>
+
+</body>
+</html>
