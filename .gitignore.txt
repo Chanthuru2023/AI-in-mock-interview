@@ -1,0 +1,29 @@
+# Ignore Windows system folders
+AppData/
+ntuser.dat*
+.VirtualBox/
+.anaconda/
+.docker/
+.dotnet/
+.ipython/
+.jupyter/
+.vscode/
+.conda/
+.keras/
+.streamlit/
+.continuum/
+.ipynb_checkpoints/
+.gitconfig
+NTUSER.DAT*
+source/
+*.ipynb
+*.html
+*.png
+
+# Ignore OneDrive folders
+*.ini
+Desktop/
+Documents/
+Downloads/
+Music/
+Videos/
