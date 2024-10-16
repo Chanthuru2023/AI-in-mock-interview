@@ -110,15 +110,30 @@
         recognition.interimResults = true;
         recognition.continuous = true;
 
+        
+
+        // recognition.onresult = (event) => {
+        //     let transcript = '';
+        //     for (let i = event.resultIndex; i < event.results.length; i++) {
+        //         if (event.results[i].isFinal) {
+        //     transcript += event.results[i][0].transcript;
+        //         }
+        //     }
+        //     transcriptionArea.value = transcript;
+        //     analyzeSentiment(transcriptionArea.value);  // Analyze sentiment on transcription update
+        // };
         recognition.onresult = (event) => {
-            let transcript = '';
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                if (event.results[i].isFinal) {
-            transcript += event.results[i][0].transcript;
-                }
+        let transcript = transcriptionArea.value; // Retain the current transcription
+    
+        // Iterate over the results and append new recognized words
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            if (event.results[i].isFinal) {
+                transcript += event.results[i][0].transcript + ' '; // Append new result
             }
-            transcriptionArea.value = transcript;
-            analyzeSentiment(transcriptionArea.value);  // Analyze sentiment on transcription update
+        }
+
+        transcriptionArea.value = transcript; // Update the textarea with the appended transcript
+        analyzeSentiment(transcriptionArea.value);  // Analyze sentiment on transcription update
         };
 
         recognition.onerror = (event) => {
