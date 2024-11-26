@@ -1,0 +1,22 @@
+
+services:
+  rohit:
+    build:
+      context: ./Rohit
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+
+  dilpreet:
+    build:
+      context: ./Dilpreet
+      dockerfile: Dockerfile
+    ports:
+      - "8502:8502"
+
+  jaskaran:
+    build:
+      context: ./Jaskaran
+      dockerfile: Dockerfile
+    ports:
+      - "8503:8503"
